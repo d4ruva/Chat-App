@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+</head>
+
+<body>
+    <input type="text" name="" id="myInp">
+    <button type="submit" id="sendBTN">Send</button>
+
+    <div id="messageHolder">
+
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    const socket = io('http://localhost:8000')
+
+    const userName = prompt("Enter username: ")
+    // let userName = "Dev"
+
+    socket.emit("new_user_join", { userName: userName })
+
+    $('#sendBTN').click(function () {
+        socket.emit("message_recv", { user: userName, msg: $('#myInp').val() })
+    })
+
+    // Recieve Message from other users
+    socket.on("msg_recieved", (data)=> {
+        $('#messageHolder').append(`<div> ${data.user} : ${data.msg} </div>`)
+    })
+
+    // On new User Joined
+    socket.on("new_user_joined", (data)=> {
+        $('#messageHolder').append(`<div> ${data.userName} joined the chat !!! </div>`)
+    })
+
+    // On user Disconnet
+
+    socket.on("user_disconnected", (data)=>{
+        $('#messageHolder').append(`<div> ${data} left the chat !!! </div>`)
+    })
+
+</script>
+
+</html>
